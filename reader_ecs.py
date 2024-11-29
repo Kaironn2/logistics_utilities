@@ -30,11 +30,12 @@ new_df = df[[
 
 new_df['CEP de entrega'] = new_df['CEP de entrega'].str.replace('.', '', regex=False)
 new_df['Prazo Dias Úteis'] = new_df['Observação Interna'].apply(extrair_prazo)
-new_df['OBservação Interna'] = new_df['Observação Interna'].apply(lambda x: dfrep.df_value_replacer(x, dfrep.company_list))
+new_df['CNPJ'] = new_df['Observação Interna'].apply(lambda x: dfrep.df_value_replacer(x, dfrep.company_list))
 new_df['Transportadora'] = new_df['Transportadora'].apply(lambda x: dfrep.df_value_replacer(x, dfrep.carrier_list))
 new_df['Data'] = new_df['Data'].apply(cf.date)
 new_df['Data do Pagamento'] = new_df['Data do Pagamento'].apply(cf.date)
 new_df['Data de Entrega'] = new_df['Data de Entrega'].apply(cf.date)
+# adicionar extração do cupom localizado em Observação Interna e, após isso, apagar a coluna de observação
 
 new_df = new_df[new_df['Nome do contato'] != 'Jose Lindemberg Filho']
 new_df = new_df.drop_duplicates(subset='Numero da Ordem', keep='first')
