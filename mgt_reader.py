@@ -2,6 +2,8 @@ import pandas as pd
 import xml.etree.ElementTree as ET
 from openpyxl import load_workbook
 from openpyxl.styles import Border, Side, NamedStyle, Alignment
+import my_person_styles as mps
+import cell_formatts as cf
 
 def magento_reader(magento_xml):
     namespaces = {'ss': 'urn:schemas-microsoft-com:office:spreadsheet'}
@@ -22,17 +24,6 @@ def magento_reader(magento_xml):
     df_magento_xml = pd.DataFrame(data_rows[1:], columns=column_names)
     return df_magento_xml
 
-def date_column_formater(column):
-    return pd.to_datetime(column, errors='coerce', dayfirst=True)
-
-def float_column_formater(df, coluns):
-    for column in coluns:
-        df[column] = df[column].str.replace('R$', '', regex=False)
-        df[column] = df[column].str.replace('.', '', regex=False)
-        df[column] = df[column].str.replace(',', '.', regex=False)
-        df[column] = df[column].astype(float)
-
-
 magento_file_name = '08-agosto'
 magento_path = f'C:\\Users\\jonat\\Desktop\\sl_codes\\{magento_file_name}' + '.xml'
 df = magento_reader(magento_path)
@@ -45,50 +36,22 @@ new_df = df[[
     ]]
 
 
-magento_float_coluns = ['Frete', 'Desconto', 'Total da Venda']
-float_column_formater(new_df, magento_float_coluns)
+magento_float_columns = ['Frete', 'Desconto', 'Total da Venda']
+cf.br_currency(new_df, magento_float_columns)
 
 new_df = new_df.rename(columns={'Pedido #': 'OC'})
 
-new_df['Comprado Em'] = new_df['Comprado Em'].apply(lambda x: x[:10])
-new_df['Comprado Em'] = new_df['Comprado Em'].apply(date_column_formater)
+new_df['Comprado Em'] = new_df['Comprado Em'].apply(cf.date)
 new_df['OC'] = pd.to_numeric(new_df['OC'], errors='coerce')
-
 
 # Estilização dos dados na planilha site
 site_sheet_path = 'C:\\Users\\jonat\\Desktop\\sl_codes\\site.xlsx'
 wb = load_workbook(site_sheet_path)
 ws = wb['Magento']
 last_row = ws.max_row + 1
- 
-# Estilização das células
-center_alignment = Alignment(horizontal='center')
 
-border = Border(
-    top=Side(style='thin'),
-    bottom=Side(style='thin'),
-    left=Side(style='thin'),
-    right=Side(style='thin')
-)
-
-
-# Named Styles
-date_style = NamedStyle(
-    name='date_style', 
-    number_format="DD/MM/YYYY", 
-    )
-
-br_currency_style = NamedStyle(
-    name='br_currency_style',
-    number_format='R$0.00',
-)
-
-my_named_styles = [date_style, br_currency_style]
-
-for style in my_named_styles:
-    if style.name not in wb.style_names:
-        wb.add_named_style(style)
-
+my_named_styles = [mps.br_currency, mps.date]
+mps.styles_verify(my_named_styles, wb)
 
 date_columns = [2]
 currencies_columns = [7, 8 , 9]
@@ -99,13 +62,13 @@ for r_index, row in new_df.iterrows():
         cell = ws.cell(row=last_row + r_index, column=c_index, value=value)
         
         if c_index in currencies_columns:
-            cell.style = 'br_currency_style'
+            cell.style = mps.br_currency.name
         
         elif c_index in date_columns:
-            cell.style = 'date_style'
+            cell.style = mps.date.name
 
-        cell.border = border
-        cell.alignment=center_alignment
+        cell.border = mps.black_border
+        cell.alignment = mps.center_alignment
             
 wb.save(site_sheet_path)
 
