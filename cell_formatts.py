@@ -1,7 +1,7 @@
 import pandas as pd
 
 def date(column):
-    return pd.to_datetime(column[:10], errors='coerce', dayfirst=True)
+    return pd.to_datetime(str(column)[:10], errors='coerce', dayfirst=True)
 
 def br_currency(df, columns):
     for column in columns:
