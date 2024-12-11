@@ -47,18 +47,6 @@ new_df = new_df.rename(columns={'Pedido #': 'OC'})
 new_df['Comprado Em'] = new_df['Comprado Em'].apply(cf.date)
 new_df['OC'] = pd.to_numeric(new_df['OC'], errors='coerce')
 
-# # Estilização dos dados na planilha site
-# site_sheet_path = 'C:\\Users\\jonat\\Desktop\\sl_codes\\site.xlsx'
-# wb = load_workbook(site_sheet_path)
-# ws = wb['Magento']
-# last_row = ws.max_row + 1
-
-# my_named_styles = [mps.br_currency, mps.date]
-# mps.styles_verify(my_named_styles, wb)
-
-# date_columns = [2]
-# currencies_columns = [7, 8 , 9]
-
 final_df = dftools.update_df(main_df, new_df, on_column='OC')
 final_df = final_df.sort_values(by='Comprado Em')
 
@@ -70,21 +58,36 @@ with pd.ExcelWriter(
     ) as writer:
     final_df.to_excel(writer, sheet_name='Magento', index=False)
 
-# for r_index, row in new_df.iterrows():
-#     for c_index, value in enumerate(row, 1):
 
-#         cell = ws.cell(row=last_row + r_index, column=c_index, value=value)
-        
-#         if c_index in currencies_columns:
-#             cell.style = mps.br_currency.name
-        
-#         elif c_index in date_columns:
-#             cell.style = mps.date.name
+# Estilização
+site_sheet_path = 'C:\\Users\\jonat\\Desktop\\sl_codes\\site.xlsx'
+wb = load_workbook(site_sheet_path)
+ws = wb['Magento']
+last_row = ws.max_row + 1
 
-#         cell.border = mps.black_border
-#         cell.alignment = mps.center_alignment
+# Verificar estilos do WB e adicionar
+my_named_styles = [mps.br_currency, mps.date]
+mps.styles_verify(my_named_styles, wb)
+
+date_columns = ['B']
+currencies_columns = ['G', 'H' , 'I']
+
+for row in ws.iter_rows():
+    if any(cell.value is not None for cell in row):
+        for cell in row:
+            if cell.column_letter in date_columns:
+                cell.style = mps.date.name
+
+            if cell.column_letter in currencies_columns:
+                cell.style = mps.br_currency.name
+
+            cell.border = mps.black_border
+            cell.alignment = mps.center_alignment
+            cell.font = "Lexend"
+
+
+wb.save(site_sheet_path)
             
-# wb.save(site_sheet_path)
 
 print('Adição e estilização de dados em site.xlsx "magento" concluída!')
 
