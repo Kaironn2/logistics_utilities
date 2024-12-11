@@ -17,23 +17,3 @@ def update_df(df_main, df_new, on_column):
             df_updated.drop(columns=[f'{column}_new'], inplace=True)
     
     return df_updated
-
-
-df_main = pd.DataFrame(
-    {
-        'ID': [1, 2, 3],
-        'Nome': ['Jonh', 'Carlos', 'Alberto'],
-        'UF': ['SP', 'BA', 'SC'],
-    }
-)
-
-df_new = pd.DataFrame(
-    {
-        'ID': [1, 4, 2, 3, 5],
-        'Nome': ['Jonathas', 'Pedro', 'Vinicius', 'Albinho', 'Vitor'],
-        'UF': ['EUA', 'ES', 'TO', 'PR', 'PB'],
-    }
-)
-
-final_df = update_df(df_main, df_new, 'ID')
-print(final_df)
