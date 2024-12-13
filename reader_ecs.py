@@ -2,8 +2,8 @@ import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle
 import df_replacers as dfrep
-import cell_formatts as cf
-import my_paths as mpaths
+import logistics_utilities.paths as mpaths
+import df_tools as dftools
 import re
 import my_person_styles as mps
 
@@ -32,9 +32,9 @@ new_df['CEP de entrega'] = new_df['CEP de entrega'].str.replace('.', '', regex=F
 new_df['Prazo Dias Úteis'] = new_df['Observação Interna'].apply(extrair_prazo)
 new_df['CNPJ'] = new_df['Observação Interna'].apply(lambda x: dfrep.df_value_replacer(x, dfrep.company_list))
 new_df['Transportadora'] = new_df['Transportadora'].apply(lambda x: dfrep.df_value_replacer(x, dfrep.carrier_list))
-new_df['Data'] = new_df['Data'].apply(cf.date)
-new_df['Data do Pagamento'] = new_df['Data do Pagamento'].apply(cf.date)
-new_df['Data de Entrega'] = new_df['Data de Entrega'].apply(cf.date)
+new_df['Data'] = new_df['Data'].apply(dftools.column_to_date)
+new_df['Data do Pagamento'] = new_df['Data do Pagamento'].apply(dftools.column_to_date)
+new_df['Data de Entrega'] = new_df['Data de Entrega'].apply(dftools.column_to_date)
 # adicionar extração do cupom localizado em Observação Interna e, após isso, apagar a coluna de observação
 
 new_df = new_df[new_df['Nome do contato'] != 'Jose Lindemberg Filho']

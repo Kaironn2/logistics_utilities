@@ -17,3 +17,13 @@ def update_df(df_main, df_new, on_column):
             df_updated.drop(columns=[f'{column}_new'], inplace=True)
     
     return df_updated
+
+def column_to_date(column):
+    return pd.to_datetime(str(column)[:10], errors='coerce', dayfirst=True)
+
+def colum_to_br_currency(df, columns):
+    for column in columns:
+        df[column] = df[column].str.replace('R$', '', regex=False)
+        df[column] = df[column].str.replace('.', '', regex=False)
+        df[column] = df[column].str.replace(',', '.', regex=False)
+        df[column] = df[column].astype(float)

@@ -8,4 +8,4 @@ sl_codes_path = logistic_utilities_path.parent
 
 ecs_path = sl_codes_path.joinpath('ecs.csv')
 mgt_path = sl_codes_path.joinpath('mgt.xml')
-site_sheet_path = sl_codes_path.joinpath('site.xlsx')
+site_workbook_path = sl_codes_path.joinpath('site.xlsx')
