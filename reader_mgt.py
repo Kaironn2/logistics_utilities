@@ -27,10 +27,11 @@ def xml_2003_reader(magento_xml):
 
 
 
-def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_folder, export_name):
+def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_path):
 
     df = xml_2003_reader(xml_path)
     wb = pd.read_excel(workbook_path, sheet_name=wb_sheet_name)
+    main_df = pd.read_excel(paths.site_workbook_path, sheet_name='mgt')
 
     mgt_float_columns = ['Frete', 'Desconto', 'Total da Venda']
 
@@ -97,19 +98,20 @@ def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_folder, export_nam
 
     print('Adição e estilização de dados em site.xlsx "magento" concluída!')
 
-    df_export_path = export_folder + export_name + '.xlsx'
+    df_export_path = export_path
     new_df.to_excel(df_export_path, index=False)
 
-mgt_file_name = '08-agosto - Copia (2)'
-magento_path = f'C:\\Users\\jonat\\Desktop\\sl_codes\\{mgt_file_name}' + '.xml'
-main_df = pd.read_excel(paths.site_workbook_path, sheet_name='Magento')
-export_file_name = f'teste 2'
-export_folder_path = f'C:\\Users\\jonat\\Desktop\\sl_codes\\export\\'
+if __name__ == '__main__':
 
-mgt_reader(
-    magento_path,
-    paths.site_workbook_path,
-    'Magento',
-    export_folder_path,
-    export_file_name
-)
+    mgt_file_name = '08-agosto - Copia (2)'
+    magento_path = f'C:\\Users\\jonat\\Desktop\\sl_codes\\{mgt_file_name}' + '.xml'
+    export_file_name = f'teste 2'
+    export_folder_path = f'C:\\Users\\jonat\\Desktop\\sl_codes\\export\\'
+
+    mgt_reader(
+        magento_path,
+        paths.site_workbook_path,
+        'Magento',
+        export_folder_path,
+        export_file_name
+    )
