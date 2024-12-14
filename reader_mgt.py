@@ -4,11 +4,11 @@ from openpyxl import load_workbook
 from openpyxl.styles import Border, Side, NamedStyle, Alignment
 import my_person_styles as mps
 import df_tools as dftools
-import paths
+import pretty_prints as pp
 
-def xml_2003_reader(magento_xml):
+def xml_2003_reader(xml_file):
     namespaces = {'ss': 'urn:schemas-microsoft-com:office:spreadsheet'}
-    tree = ET.parse(magento_xml)
+    tree = ET.parse(xml_file)
     root = tree.getroot()
     data_rows = []
 
@@ -22,16 +22,15 @@ def xml_2003_reader(magento_xml):
     data_rows.pop()
 
     column_names = data_rows[0] if data_rows else []
-    df_magento_xml = pd.DataFrame(data_rows[1:], columns=column_names)
-    return df_magento_xml
-
+    df_mgt_xml = pd.DataFrame(data_rows[1:], columns=column_names)
+    return df_mgt_xml
 
 
 def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_path):
 
     df = xml_2003_reader(xml_path)
     wb = pd.read_excel(workbook_path, sheet_name=wb_sheet_name)
-    main_df = pd.read_excel(paths.site_workbook_path, sheet_name='mgt')
+    main_df = pd.read_excel(workbook_path, sheet_name='mgt')
 
     mgt_float_columns = ['Frete', 'Desconto', 'Total da Venda']
 
@@ -60,17 +59,17 @@ def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_path):
 
 
     with pd.ExcelWriter(
-        paths.site_workbook_path,
+        workbook_path,
         engine='openpyxl',
         mode='a',
         if_sheet_exists='overlay'
         ) as writer:
-        final_df.to_excel(writer, sheet_name='Magento', index=False)
+        final_df.to_excel(writer, sheet_name='mgt', index=False)
 
 
     # Estilização
-    wb = load_workbook(paths.site_workbook_path)
-    ws = wb['Magento']
+    wb = load_workbook(workbook_path)
+    ws = wb['mgt']
 
     # Verificar estilos do WB e adicionar
     my_named_styles = [mps.br_currency, mps.date]
@@ -79,7 +78,14 @@ def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_path):
     date_columns = ['B']
     currencies_columns = ['G', 'H' , 'I']
 
+    style_print_counter = 0
     for row in ws.iter_rows():
+        pp.sleep_with_cls(0.5)
+        if style_print_counter == 3:
+            style_print_counter = 0
+        style_print_counter += 1
+        print('Estilizando' + '.' * style_print_counter)
+
         if any(cell.value is not None for cell in row):
             for cell in row:
                 if cell.column_letter in date_columns:
@@ -93,25 +99,9 @@ def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_path):
                 cell.font = "Lexend"
 
 
-    wb.save(paths.site_workbook_path)
-                
-
-    print('Adição e estilização de dados em site.xlsx "magento" concluída!')
+    wb.save(workbook_path)
+    
+    pp.print_with_cls('Estilização concluída!')
 
     df_export_path = export_path
     new_df.to_excel(df_export_path, index=False)
-
-if __name__ == '__main__':
-
-    mgt_file_name = '08-agosto - Copia (2)'
-    magento_path = f'C:\\Users\\jonat\\Desktop\\sl_codes\\{mgt_file_name}' + '.xml'
-    export_file_name = f'teste 2'
-    export_folder_path = f'C:\\Users\\jonat\\Desktop\\sl_codes\\export\\'
-
-    mgt_reader(
-        magento_path,
-        paths.site_workbook_path,
-        'Magento',
-        export_folder_path,
-        export_file_name
-    )
