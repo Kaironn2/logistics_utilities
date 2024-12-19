@@ -29,15 +29,19 @@ def colum_to_br_currency(df, columns):
         df[column] = df[column].str.replace(',', '.', regex=False)
         df[column] = df[column].astype(float)
 
-def create_wb_sheet(wb_path, sheet_name, columns_list):
+def create_wb_sheet(wb_path, sheets_dict):
+
     try:
         wb = load_workbook(wb_path)
     except FileNotFoundError:
-        wb = Workbook(sheet_name)
+        wb = Workbook()
+        default_sheet = wb.active
+        wb.remove(default_sheet)
 
-    if sheet_name not in wb.sheetnames:
-        wb.create_sheet(sheet_name)
-        sheet = wb[sheet_name]
-        sheet.append(columns_list)
-    
+    for sheet_name, columns_list in sheets_dict.items():
+        if sheet_name not in wb.sheetnames:
+            wb.create_sheet(sheet_name)
+            sheet = wb[sheet_name]
+            sheet.append(columns_list)
+
     wb.save(wb_path)

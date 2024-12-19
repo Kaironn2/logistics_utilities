@@ -28,14 +28,13 @@ def xml_2003_reader(xml_file):
 
 def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_path):
 
-    wb_columns_names = ['OC', 'Data', 'Nome', 'CPF', 'Email', 'Telefone', 'Frete', 'Desconto', 'Total da Venda', 'Método Pagamento', 'Status']
-    dftools.create_wb_sheet(workbook_path, wb_sheet_name, wb_columns_names)
-
     df = xml_2003_reader(xml_path)
     wb = pd.read_excel(workbook_path, sheet_name=wb_sheet_name)
     main_df = pd.read_excel(workbook_path, sheet_name='mgt')
 
     mgt_float_columns = ['Frete', 'Desconto', 'Total da Venda']
+
+    df['Firstname'] = df['Firstname'] + ' ' + df['Lastname']
 
     new_df = df[[
     'Pedido #', 'Comprado Em', 'Firstname', 'Email', 'Número CPF/CNPJ',
@@ -83,7 +82,7 @@ def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_path):
 
     style_print_counter = 0
     for row in ws.iter_rows():
-        pp.sleep_with_cls(0.5)
+        # pp.sleep_with_cls(0.5)
         if style_print_counter == 3:
             style_print_counter = 0
         style_print_counter += 1
@@ -104,7 +103,7 @@ def mgt_reader(xml_path, workbook_path, wb_sheet_name, export_path):
 
     wb.save(workbook_path)
     
-    pp.print_with_cls('Estilização concluída!')
+    # pp.print_with_cls('Estilização concluída!')
 
     df_export_path = export_path
     new_df.to_excel(df_export_path, index=False)

@@ -1,4 +1,5 @@
 from reader_mgt import mgt_reader
+import df_tools as dftools
 import paths
 
 mgt_config = True
@@ -8,6 +9,12 @@ ath_config = False
 jet_config = False
 azl_config = False
 crr_config = False
+
+wb_sheets = {
+    'mgt': ['OC', 'Data', 'Nome', 'CPF', 'Email', 'Telefone', 'Frete', 'Desconto', 'Total da Venda', 'Método Pagamento', 'Status', 'Rastreio'],
+    'ecs': ['Pao', 'Alho', 'Nome', 'CPF', 'Email', 'Telefone', 'Frete', 'Desconto', 'Total da Venda', 'Método Pagamento', 'Status', 'Rastreio']
+}
+dftools.create_wb_sheet(paths.site_workbook_path, wb_sheets)
 
 if mgt_config:
 
